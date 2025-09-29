@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import config from "../config";
 import {
     View,
     Text,
@@ -17,8 +18,7 @@ export default function RegisterScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [telefone, setTelefone] = useState("");
     const [password, setPassword] = useState("");
-    const [categoria, setCategoria] = useState(""); // caso tenha input
-    const [tipo, setTipo] = useState(""); // caso tenha input
+
 
     const handleRegister = async () => {
         if (!nome || !email || !telefone || !password) {
@@ -27,7 +27,7 @@ export default function RegisterScreen({ navigation }) {
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/cadastro", {
+            const response = await fetch(`${config.IP_LOCAL}/cadastro`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -37,14 +37,12 @@ export default function RegisterScreen({ navigation }) {
                     email,
                     telefone,
                     senha: password,
-                    categoria,
-                    tipo,
                 }),
             });
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (!response.ok) { //propriedade automatica (casos em que o login falhou- LEMBRAR)
                 Alert.alert("Erro", data.error || "Erro ao cadastrar.");
                 return;
             }

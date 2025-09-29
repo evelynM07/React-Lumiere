@@ -1,5 +1,5 @@
-// src/screens/Login.js
 import React, { useState } from "react";
+import config from "../config";
 import { Ionicons } from "@expo/vector-icons";
 import {
     View,
@@ -26,7 +26,7 @@ export default function Login({ navigation }) {
 
         try {
             setLoading(true);
-            const response = await fetch("http://127.0.0.1:5000/login", {
+            const response = await fetch(`${config.IP_LOCAL}/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
