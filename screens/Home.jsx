@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
     View,
     Text,
@@ -22,7 +23,7 @@ export default function Home() {
 
     return (
         <ImageBackground
-            source={require("../assets/fundo.login.png")}
+            source={require("../assets/fundo.brilho.png")}
             style={styles.background}
         >
             <SafeAreaView style={styles.container}>
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: "rgba(75, 31, 31, 0.9)",
+        backgroundColor: "rgba(87,42,42,0.44)",
         alignItems: "center",
         padding: 20,
     },
