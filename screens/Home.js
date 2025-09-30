@@ -6,6 +6,7 @@ import {
     StyleSheet,
     ScrollView,
     Image,
+    ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -20,85 +21,103 @@ export default function Home() {
     ];
 
     return (
-        <View style={styles.container}>
-            {/* HEADER */}
-            <TouchableOpacity style={styles.backButton}>
-                <Ionicons name="arrow-back" size={22} color="#fff" />
-            </TouchableOpacity>
+        <ImageBackground
+            source={require("../assets/fundo.login.png")}
+            style={styles.background}
+        >
+            <SafeAreaView style={styles.container}>
+                {/* HEADER */}
+                <TouchableOpacity style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={22} color="#fff" />
+                </TouchableOpacity>
 
-            <Image source={require("../assets/logo.png")} style={styles.logo} />
+                <Image source={require("../assets/logo.png")} style={styles.logo} />
 
-            <Text style={styles.title}>Bem-vindo(a) {"\n"} <Text style={{ fontStyle: "italic" }}>Nome!</Text></Text>
+                <Text style={styles.title}>
+                    Bem-vindo(a) {"\n"}
+                    <Text style={{ fontStyle: "italic" }}>Nome!</Text>
+                </Text>
 
-            {/* SELECTS */}
-            <Text style={styles.label}>Selecione o serviço que deseja obter</Text>
-            <TouchableOpacity style={styles.selectButton}>
-                <Text style={styles.selectText}>Selecione o serviço ></Text>
-            </TouchableOpacity>
+                {/* SELECTS */}
+                <Text style={styles.label}>Selecione o serviço que deseja obter</Text>
+                <TouchableOpacity style={styles.selectButton}>
+                    <Text style={styles.selectText}>Selecione o serviço ></Text>
+                </TouchableOpacity>
 
-            <Text style={styles.label}>Selecione o profissional que deseja</Text>
-            <TouchableOpacity style={styles.selectButton}>
-                <Text style={styles.selectText}>Selecione o profissional ></Text>
-            </TouchableOpacity>
+                <Text style={styles.label}>Selecione o profissional que deseja</Text>
+                <TouchableOpacity style={styles.selectButton}>
+                    <Text style={styles.selectText}>Selecione o profissional ></Text>
+                </TouchableOpacity>
 
-            {/* LISTA DE HORÁRIOS */}
-            <Text style={styles.sectionTitle}>HORÁRIOS DISPONÍVEIS</Text>
+                {/* LISTA DE HORÁRIOS */}
+                <Text style={styles.sectionTitle}>HORÁRIOS DISPONÍVEIS</Text>
 
-            <ScrollView style={{ width: "100%" }}>
-                {horarios.map((item) => (
-                    <TouchableOpacity
-                        key={item.id}
-                        style={[
-                            styles.horarioItem,
-                            selectedHorario === item.id && styles.horarioSelecionado,
-                        ]}
-                        onPress={() => setSelectedHorario(item.id)}
-                    >
-                        <Ionicons
-                            name={
-                                selectedHorario === item.id
-                                    ? "radio-button-on"
-                                    : "radio-button-off"
-                            }
-                            size={20}
-                            color={selectedHorario === item.id ? "#5b1818" : "#333"}
-                            style={{ marginRight: 8 }}
-                        />
-                        <Text style={styles.horarioText}>
-                            {item.data} - às {item.hora}
-                        </Text>
+                <ScrollView
+                    style={{ width: "100%", marginBottom: 15 }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {horarios.map((item) => {
+                        const isSelected = selectedHorario === item.id;
+                        return (
+                            <TouchableOpacity
+                                key={item.id}
+                                style={[
+                                    styles.horarioItem,
+                                    isSelected && styles.horarioSelecionado,
+                                ]}
+                                onPress={() => setSelectedHorario(item.id)}
+                            >
+                                <Ionicons
+                                    name={isSelected ? "radio-button-on" : "radio-button-off"}
+                                    size={20}
+                                    color={isSelected ? "#5b1818" : "#fff"}
+                                    style={{ marginRight: 8 }}
+                                />
+                                <Text
+                                    style={[
+                                        styles.horarioText,
+                                        isSelected && styles.horarioTextSelecionado,
+                                    ]}
+                                >
+                                    {item.data} - às {item.hora}
+                                </Text>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </ScrollView>
+
+                {/* BOTÃO AGENDAR */}
+                <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>AGENDAR</Text>
+                </TouchableOpacity>
+
+                {/* MENU INFERIOR */}
+                <View style={styles.footerMenu}>
+                    <TouchableOpacity>
+                        <Ionicons name="person-outline" size={24} color="#fff" />
                     </TouchableOpacity>
-                ))}
-            </ScrollView>
-
-            {/* BOTÃO AGENDAR */}
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>AGENDAR</Text>
-            </TouchableOpacity>
-
-            {/* MENU INFERIOR */}
-            <View style={styles.footerMenu}>
-                <TouchableOpacity>
-                    <Ionicons name="person-outline" size={24} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Ionicons name="home-outline" size={24} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ position: "relative" }}>
-                    <Ionicons name="notifications-outline" size={24} color="#fff" />
-                    <View style={styles.badge}>
-                        <Text style={styles.badgeText}>3</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        </View>
+                    <TouchableOpacity>
+                        <Ionicons name="home-outline" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{ position: "relative" }}>
+                        <Ionicons name="notifications-outline" size={24} color="#fff" />
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>3</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: "#4b1f1f",
+        backgroundColor: "rgba(75, 31, 31, 0.9)",
         alignItems: "center",
         padding: 20,
     },
@@ -159,6 +178,10 @@ const styles = StyleSheet.create({
     },
     horarioText: {
         color: "#fff",
+    },
+    horarioTextSelecionado: {
+        color: "#5b1818",
+        fontWeight: "600",
     },
     button: {
         marginTop: 10,
