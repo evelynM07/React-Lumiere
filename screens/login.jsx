@@ -12,52 +12,68 @@ import {
     Alert,
 } from "react-native";
 
+//exporta o componente Login
 export default function Login({ navigation }) {
-    const [email, setEmail] = useState("");
-    const [senha, setSenha] = useState("");
-    const [secureText, setSecureText] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState("");        //e-mail
+    const [senha, setSenha] = useState("");        //senha
+    const [secureText, setSecureText] = useState(true); //controla se a senha está visível ou escondida
+    const [loading, setLoading] = useState(false); //indica se o app está processando o login
 
+    //função quando o botão "Entrar" é pressionado
     const handleLogin = async () => {
+        //verifica se os campos estão preenchidos
         if (!email || !senha) {
-            Alert.alert("Erro", "Preencha todos os campos.");
+            Alert.alert("Erro", "Preencha todos os campos."); //mostra alerta se faltar algo
             return;
         }
 
         try {
-            setLoading(true);
+            setLoading(true); //modo "carregando" (mostra texto "entrando")
+
+            // Envia uma requisição POST ao backend para fazer login
             const response = await fetch(`${config.IP_LOCAL}/login`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json", //formato JSON
                 },
-                body: JSON.stringify({ email, senha }),
+                body: JSON.stringify({ email, senha }), //converte os dados digitados em JSON
             });
 
+            //converte a resposta do servidor para JSON
             const data = await response.json();
 
+            //se o login não for sucedido (erro do servidor ou dados inválidos)
             if (!response.ok) {
-                Alert.alert("Erro", data.error || "Falha no login.");
+                Alert.alert("Erro", data.error || "Falha no login."); //mensagem de erro
                 return;
             }
 
+            //mensagem de sucesso
             Alert.alert("Sucesso", data.message);
+            //navega para a tela "Home" e envia os dados do usuário logado
             navigation.navigate("Home", { user: data.usuarios });
         } catch (error) {
+            //caso ocorra algum erro de conexão com o servidor
             Alert.alert("Erro", "Não foi possível conectar ao servidor.");
-            console.error(error);
+            console.error(error); //erro no console
         } finally {
-            setLoading(false);
+            setLoading(false); //desativa o modo de carregamento
         }
     };
 
+    //retorna a interface da tela de Login
     return (
+        //imagem de fundo
         <ImageBackground
             source={require("../assets/fundo.login.png")}
             style={styles.background}
         >
+
             <Image source={require("../assets/logo.png")} style={styles.logo} />
+
+
             <Text style={styles.title}>Seja bem-vindo(a)!</Text>
+
 
             <Text style={styles.label}>E-MAIL</Text>
             <TextInput
@@ -65,10 +81,11 @@ export default function Login({ navigation }) {
                 placeholder="Digite seu e-mail"
                 placeholderTextColor="#aaa"
                 value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
+                onChangeText={setEmail}                  // Atualiza o estado "email" conforme o usuário digita
+                autoCapitalize="none"                    // Impede letras maiúsculas automáticas
+                keyboardType="email-address"             // Mostra teclado e-mail
             />
+
 
             <Text style={styles.label}>SENHA</Text>
             <View style={styles.passwordContainer}>
@@ -76,28 +93,31 @@ export default function Login({ navigation }) {
                     style={styles.inputSenha}
                     placeholder="Digite sua senha"
                     placeholderTextColor="#aaa"
-                    secureTextEntry={secureText}
+                    secureTextEntry={secureText}          //esconde(false) ou mostra(true) a senha dependendo do estado (olhinho; •••••••)
                     value={senha}
-                    onChangeText={setSenha}
+                    onChangeText={setSenha}               //atualiza o estado "senha"
                 />
+                {/* Botão com ícone de olho para mostrar/esconder senha */}
                 <TouchableOpacity onPress={() => setSecureText(!secureText)}>
                     <Ionicons
-                        name={secureText ? "eye-off-outline" : "eye-outline"}
+                        name={secureText ? "eye-off-outline" : "eye-outline"} //muda o olho conforme o estado
                         size={22}
                         color="#fff"
                     />
                 </TouchableOpacity>
             </View>
 
+
             <TouchableOpacity
                 style={styles.button}
-                onPress={handleLogin}
-                disabled={loading}
+                onPress={handleLogin}        //função handleLogin ao clicar (função do botão cadast. pressionado)
+                disabled={loading}           //desativa o botão enquanto carrega
             >
                 <Text style={styles.buttonText}>
-                    {loading ? "Entrando..." : "ENTRAR"}
+                    {loading ? "Entrando..." : "ENTRAR"} // Mostra "Entrando..." durante o login
                 </Text>
             </TouchableOpacity>
+
 
             <Text style={styles.footerText}>
                 Não possui uma conta?
@@ -105,8 +125,7 @@ export default function Login({ navigation }) {
                     style={styles.cadastro}
                     onPress={() => navigation.navigate("Register")}
                 >
-                    {" "}
-                    Cadastre-se
+                    {" "}Cadastre-se
                 </Text>
             </Text>
         </ImageBackground>
