@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"; //evita que o conteúdo da tela fique atrás da barra superior do celular
-
 import {
     View,
     Text,
@@ -12,7 +11,7 @@ import {
     Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; //importa os ícones da biblioteca
-import AsyncStorage from "@react-native-async-storage/async-storage"; //o AsyncStorage é usado para salvar e apagar dados locais no cell
+import AsyncStorage from "@react-native-async-storage/async-storage"; //é usado para salvar e apagar dados locais no cell
 import { useNavigation } from "@react-navigation/native";
 
 //função home
