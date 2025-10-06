@@ -114,7 +114,7 @@ export default function Login({ navigation }) {
                 disabled={loading}           //desativa o botão enquanto carrega
             >
                 <Text style={styles.buttonText}>
-                    {loading ? "Entrando..." : "ENTRAR"} // Mostra "Entrando..." durante o login
+                    {loading ? "Entrando..." : "ENTRAR"} {/*Mostra "Entrando..." durante o login*/}
                 </Text>
             </TouchableOpacity>
 

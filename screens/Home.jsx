@@ -14,8 +14,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 //exporta o componente Home
 export default function Home() {
-    //cria uma variável para armazenar qual horário foi selecionado
-    const [selectedHorario, setSelectedHorario] = useState(null);
+    const [selectedHorario, setSelectedHorario] = useState(null);  //cria uma variável para armazenar qual horário foi selecionado
+
 
     //lista com os horários disponíveis (sem o banco implementsdo)
     const horarios = [
