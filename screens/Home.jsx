@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context"; //evita que o conteúdo da tela fique atrás da barra superior do celular
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
     View,
     Text,
@@ -10,14 +10,14 @@ import {
     ImageBackground,
     Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; //importa os ícones da biblioteca
-import AsyncStorage from "@react-native-async-storage/async-storage"; //é usado para salvar e apagar dados locais no cell
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
-//função home
 export default function Home() {
-    const [selectedHorario, setSelectedHorario] = useState(null);//estado para armazenar qual horário foi selecionado
+    const [selectedHorario, setSelectedHorario] = useState(null);
     const navigation = useNavigation();
+
     const horarios = [
         { id: 1, data: "02/09/2025", hora: "18h" },
         { id: 2, data: "08/09/2025", hora: "16h" },
@@ -25,40 +25,33 @@ export default function Home() {
         { id: 4, data: "28/09/2025", hora: "16h" },
     ];
 
-    //função logout
+    // função de logout
     const handleLogout = async () => {
         Alert.alert(
             "Sair da conta",
             "Deseja realmente sair?",
             [
                 { text: "Cancelar", style: "cancel" },
-
-                //botão "Sair" apaga o token e volta para a tela de login
                 {
                     text: "Sair",
                     style: "destructive",
                     onPress: async () => {
-                        //remove o token salvo no armazenamento local
                         await AsyncStorage.removeItem("userToken");
-                        //redireciona o usuário para a tela de Login
                         navigation.replace("Login");
                     },
                 },
             ],
-            { cancelable: true } //fechs o alerta tocando fora da caixa
+            { cancelable: true }
         );
     };
-
 
     return (
         <ImageBackground
             source={require("../assets/fundo.brilho.png")}
             style={styles.background}
         >
-            {/*garante que o conteúdo não fique escondido pela barra superior do celular */}
             <SafeAreaView style={styles.container}>
-
-                {/*botão logout */}
+                {/* botão logout (seta superior) */}
                 <TouchableOpacity style={styles.backButton} onPress={handleLogout}>
                     <Ionicons name="log-out-outline" size={24} color="#fff" />
                 </TouchableOpacity>
@@ -84,35 +77,29 @@ export default function Home() {
 
                 <ScrollView
                     style={{ width: "100%", marginBottom: 15 }}
-                    showsVerticalScrollIndicator={false} //esconde a barrinha de rolagem
+                    showsVerticalScrollIndicator={false}
                 >
-                    {/*ta percorremdo o array de horários e exibe um botão para cada um */}
-                    {horarios.map((item) => { {/*o "item" representa cada horário da lista*/}
-                        const isSelected = selectedHorario === item.id;//verifica se o horário atual é o que foi selecionado
-
-                        //retorna um botão com o horário
+                    {horarios.map((item) => {
+                        const isSelected = selectedHorario === item.id;
                         return (
                             <TouchableOpacity
-                                key={item.id} // identificador único (necessário no React)
+                                key={item.id}
                                 style={[
                                     styles.horarioItem,
-                                    isSelected && styles.horarioSelecionado, //aplica estilo diferente quando selecionado
+                                    isSelected && styles.horarioSelecionado,
                                 ]}
-                                onPress={() => setSelectedHorario(item.id)} //marca o horário quando clicado
+                                onPress={() => setSelectedHorario(item.id)}
                             >
-                                {/*icone do tipo "radio button" (bolinha) */}
                                 <Ionicons
-                                    name={isSelected ? "radio-button-on" : "radio-button-off"} //icone muda conforme a seleção
+                                    name={isSelected ? "radio-button-on" : "radio-button-off"}
                                     size={20}
-                                    color={isSelected ? "#5b1818" : "#fff"} //cor muda se selecionado
+                                    color={isSelected ? "#5b1818" : "#fff"}
                                     style={{ marginRight: 8 }}
                                 />
-
-                                {/*texto com data e hora do item */}
                                 <Text
                                     style={[
                                         styles.horarioText,
-                                        isSelected && styles.horarioTextSelecionado, //muda a cor se estiver selecionado
+                                        isSelected && styles.horarioTextSelecionado,
                                     ]}
                                 >
                                     {item.data} - às {item.hora}
@@ -122,28 +109,25 @@ export default function Home() {
                     })}
                 </ScrollView>
 
-                {/* botão que confirma o agendamento */}
                 <TouchableOpacity style={styles.button}>
                     <Text style={styles.buttonText}>AGENDAR</Text>
                 </TouchableOpacity>
 
-                {/* menu com ícones de navegação */}
+                {/* menu inferior */}
                 <View style={styles.footerMenu}>
-                    {/* icone perfil */}
-                    <TouchableOpacity>
+                    {/* ícone perfil → abre tela de editar perfil */}
+                    <TouchableOpacity onPress={() => navigation.navigate("EditarPerfil")}>
                         <Ionicons name="person-outline" size={24} color="#fff" />
                     </TouchableOpacity>
 
-                    {/*icone home */}
-                    <TouchableOpacity>
+                    {/* ícone home */}
+                    <TouchableOpacity onPress={() => navigation.navigate("Home")}>>
                         <Ionicons name="home-outline" size={24} color="#fff" />
                     </TouchableOpacity>
 
-                    {/*icone de notificações com bolinha de contagem */}
+                    {/* ícone notificações */}
                     <TouchableOpacity style={{ position: "relative" }}>
                         <Ionicons name="notifications-outline" size={24} color="#fff" />
-
-                        {/*bolinha vermelha de notificações */}
                         <View style={styles.badge}>
                             <Text style={styles.badgeText}>3</Text>
                         </View>
