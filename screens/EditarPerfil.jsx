@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -8,42 +8,102 @@ import {
     ImageBackground,
     Image,
     Alert,
+    ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
+//exporta o componente EditarPerfil
 export default function EditarPerfil({ navigation }) {
-    const [nome, setNome] = useState("Nome aleatório");
-    const [email, setEmail] = useState("email@gmail.com");
-    const [telefone, setTelefone] = useState("(18)00000-0000");
-    const [senha, setSenha] = useState("Senha@123");
+    const [nome, setNome] = useState("");
+    const [email, setEmail] = useState("");
+    const [telefone, setTelefone] = useState("");
+    const [senha, setSenha] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const API_URL = "http://10.0.2.2:5000"; // Emulador Android
+    // const API_URL = "http://10.92.3.193:5000"; // Celular físico
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            let userId = null;
+            try {
+                userId = await AsyncStorage.getItem("userId");
+                console.log("ID do usuário logado:", userId);
+
+                if (!userId) {
+                    Alert.alert("Erro", "Usuário não encontrado. Faça login novamente.");
+                    navigation.replace("Login");
+                    return;
+                }
+
+                const url = `${API_URL}/cadastro/${userId}`;
+                console.log("Buscando dados do usuário em:", url);
+
+                const response = await fetch(url);
+                console.log("Status da resposta:", response.status);
+
+                const text = await response.text(); // lê como texto primeiro
+                console.log("Resposta raw:", text);
+
+                let data;
+                try {
+                    data = JSON.parse(text); // tenta parsear JSON
+                } catch (err) {
+                    console.error("Erro ao parsear JSON:", err);
+                    Alert.alert("Erro", "Resposta do servidor inválida.");
+                    return;
+                }
+
+                console.log("Dados parseados:", data);
+
+                if (response.ok) {
+                    setNome(data.nome || "");
+                    setEmail(data.email || "");
+                    setTelefone(data.telefone || "");
+                    setSenha("");
+                } else {
+                    Alert.alert("Erro", data.error || "Falha ao buscar dados do perfil.");
+                    navigation.replace("Login");
+                }
+            } catch (error) {
+                console.error("Erro ao buscar usuário:", error);
+                Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+            } finally {
+                setLoading(false); // garante que loading sempre será desligado
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     const handleSave = async () => {
         try {
-            const userId = await AsyncStorage.getItem("userId"); // ID do usuário logado
+            const userId = await AsyncStorage.getItem("userId");
             if (!userId) {
                 Alert.alert("Erro", "ID do usuário não encontrado.");
                 return;
             }
 
-            const response = await fetch(`http://10.92.3.193:5000/cadastro/${userId}`, {
+            const response = await fetch(`${API_URL}/cadastro/${userId}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    nome,
-                    email,
-                    telefone,
-                    senha,
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome, email, telefone, senha }),
             });
 
-            const data = await response.json();
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (err) {
+                console.error("Erro ao parsear JSON:", err);
+                Alert.alert("Erro", "Resposta inválida do servidor.");
+                return;
+            }
 
             if (response.ok) {
-                Alert.alert("Sucesso", data.message || "Usuário atualizado com sucesso!");
+                Alert.alert("Sucesso", data.message || "Perfil atualizado!");
             } else {
                 Alert.alert("Erro", data.error || "Falha ao atualizar perfil!");
             }
@@ -54,56 +114,36 @@ export default function EditarPerfil({ navigation }) {
     };
 
     const handleLogout = async () => {
-        Alert.alert(
-            "Sair da conta",
-            "Deseja realmente sair?",
-            [
-                { text: "Cancelar", style: "cancel" },
-                {
-                    text: "Sair",
-                    style: "destructive",
-                    onPress: async () => {
-                        await AsyncStorage.removeItem("userToken");
-                        navigation.replace("Login");
-                    },
-                },
-            ],
-            { cancelable: true }
-        );
+        try {
+            await AsyncStorage.clear();
+            Alert.alert("Logout", "Você saiu da conta.");
+            navigation.replace("Login");
+        } catch (error) {
+            console.error("Erro ao deslogar:", error);
+        }
     };
 
-    const handleDelete = () => {
-        alert("Conta excluída!");
-    };
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#000" }}>
+                <ActivityIndicator size="large" color="#fff" />
+                <Text style={{ color: "#fff", marginTop: 10 }}>Carregando perfil...</Text>
+            </View>
+        );
+    }
 
     return (
-        <ImageBackground
-            source={require("../assets/fundo.login.png")}
-            style={styles.background}
-        >
-
+        <ImageBackground source={require("../assets/fundo.login.png")} style={styles.background}>
             <View style={styles.container}>
-                {/* SETA VOLTAR */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="#fff" />
                 </TouchableOpacity>
 
-                {/* LOGO */}
-                <Image
-                    source={require("../assets/logo.png")}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
+                <Image source={require("../assets/logo.png")} style={styles.logo} resizeMode="contain" />
 
                 <Text style={styles.title}>Meu perfil</Text>
-                <Text style={styles.subtitle}>
-                    Altere as informações do cadastro, se desejar
-                </Text>
+                <Text style={styles.subtitle}>Altere as informações do cadastro, se desejar</Text>
 
-                {/* CAMPOS */}
                 <View style={styles.fieldContainer}>
                     <Text style={styles.label}>NOME</Text>
                     <TextInput
@@ -119,10 +159,10 @@ export default function EditarPerfil({ navigation }) {
                     <Text style={styles.label}>E-MAIL</Text>
                     <TextInput
                         style={styles.input}
-                        keyboardType="email-address"
                         value={email}
                         onChangeText={setEmail}
                         placeholder="Digite seu e-mail"
+                        keyboardType="email-address"
                         placeholderTextColor="#999"
                     />
                 </View>
@@ -131,9 +171,9 @@ export default function EditarPerfil({ navigation }) {
                     <Text style={styles.label}>TELEFONE</Text>
                     <TextInput
                         style={styles.input}
-                        keyboardType="phone-pad"
                         value={telefone}
                         onChangeText={setTelefone}
+                        keyboardType="phone-pad"
                         placeholder="(00) 00000-0000"
                         placeholderTextColor="#999"
                     />
@@ -147,67 +187,22 @@ export default function EditarPerfil({ navigation }) {
                             secureTextEntry={!showPassword}
                             value={senha}
                             onChangeText={setSenha}
-                            placeholder="Digite sua senha"
+                            placeholder="Digite sua nova senha"
                             placeholderTextColor="#999"
                         />
-                        <TouchableOpacity
-                            onPress={() => setShowPassword(!showPassword)}
-                            style={styles.eyeButton}
-                        >
-                            <Ionicons
-                                name={showPassword ? "eye-off" : "eye"}
-                                size={20}
-                                color="#4A4A4A"
-                            />
+                        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
+                            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#4A4A4A" />
                         </TouchableOpacity>
                     </View>
                 </View>
 
-                <Text style={styles.passwordNote}>
-                    *A sua senha precisa ter pelo menos 8 caracteres, uma letra maiúscula,
-                    uma letra minúscula, um número e um caractere especial.
-                </Text>
-
-                {/* BOTÃO SALVAR */}
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.buttonText}>SALVAR</Text>
                 </TouchableOpacity>
 
-                {/* BOTÕES INFERIORES */}
-                <View style={styles.bottomButtons}>
-                    <TouchableOpacity
-                        style={styles.secondaryButton}
-                        onPress={handleLogout}
-                    >
-                        <Ionicons name="log-out-outline" size={18} color="#fff" />
-                        <Text style={styles.secondaryButtonText}>DESLOGAR</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.secondaryButton}
-                        onPress={handleDelete}
-                    >
-                        <Ionicons name="trash-outline" size={18} color="#fff" />
-                        <Text style={styles.secondaryButtonText}>EXCLUIR CONTA</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            {/* menu inferior */}
-            <View style={styles.footerMenu}>
-                <TouchableOpacity onPress={() => navigation.navigate("EditarPerfil")}>
-                    <Ionicons name="person-outline" size={24} color="#fff" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-                    <Ionicons name="home-outline" size={24} color="#fff" />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={{ position: "relative" }}>
-                    <Ionicons name="notifications-outline" size={24} color="#fff" />
-                    <View style={styles.badge}>
-                        <Text style={styles.badgeText}>3</Text>
-                    </View>
+                <TouchableOpacity style={styles.secondaryButton} onPress={handleLogout}>
+                    <Ionicons name="log-out-outline" size={18} color="#fff" />
+                    <Text style={styles.secondaryButtonText}>DESLOGAR</Text>
                 </TouchableOpacity>
             </View>
         </ImageBackground>

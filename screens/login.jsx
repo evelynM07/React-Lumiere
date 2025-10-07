@@ -11,69 +11,73 @@ import {
     ImageBackground,
     Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //exporta o componente Login
 export default function Login({ navigation }) {
-    const [email, setEmail] = useState("");        //e-mail
-    const [senha, setSenha] = useState("");        //senha
-    const [secureText, setSecureText] = useState(true); //controla se a senha está visível ou escondida
-    const [loading, setLoading] = useState(false); //indica se o app está processando o login
+    const [email, setEmail] = useState("");        // e-mail
+    const [senha, setSenha] = useState("");        // senha
+    const [secureText, setSecureText] = useState(true); // controla visibilidade da senha
+    const [loading, setLoading] = useState(false); // indica carregamento
 
     //função quando o botão "Entrar" é pressionado
     const handleLogin = async () => {
-        //verifica se os campos estão preenchidos
         if (!email || !senha) {
-            Alert.alert("Erro", "Preencha todos os campos."); //mostra alerta se faltar algo
+            Alert.alert("Erro", "Preencha todos os campos.");
             return;
         }
 
         try {
-            setLoading(true); //modo "carregando" (mostra texto "entrando")
+            setLoading(true);
 
-            // Envia uma requisição POST ao backend para fazer login
             const response = await fetch(`${config.IP_LOCAL}/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json", //formato JSON
-                },
-                body: JSON.stringify({ email, senha }), //converte os dados digitados em JSON
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, senha }),
             });
 
-            //converte a resposta do servidor para JSON
             const data = await response.json();
+            console.log("Resposta do backend:", data);
 
-            //se o login não for sucedido (erro do servidor ou dados inválidos)
-            if (!response.ok) {
-                Alert.alert("Erro", data.error || "Falha no login."); //mensagem de erro
+            // tenta pegar id e token dentro de data.usuario
+            const userId = data.usuario?.id_cadastro;
+            const token = data.usuario?.token;
+
+            if (!userId) {
+                Alert.alert("Erro", "ID do usuário não retornado pelo backend.");
+                console.warn("Login sem ID do usuário:", data);
                 return;
             }
 
-            //mensagem de sucesso
-            Alert.alert("Sucesso", data.message);
-            //navega para a tela "Home" e envia os dados do usuário logado
-            navigation.navigate("Home", { user: data.usuarios });
+            // Salva ID do usuário no AsyncStorage
+            await AsyncStorage.setItem("userId", String(userId));
+            console.log("ID salvo no AsyncStorage:", userId);
+
+            // Salva token se existir
+            if (token) {
+                await AsyncStorage.setItem("userToken", token);
+                console.log("Token salvo no AsyncStorage:", token);
+            }
+
+            Alert.alert("Sucesso", data.message || "Login efetuado com sucesso!");
+            navigation.replace("Home");
+
         } catch (error) {
-            //caso ocorra algum erro de conexão com o servidor
+            console.error("Erro no login:", error);
             Alert.alert("Erro", "Não foi possível conectar ao servidor.");
-            console.error(error); //erro no console
         } finally {
-            setLoading(false); //desativa o modo de carregamento
+            setLoading(false);
         }
     };
 
-    //retorna a interface da tela de Login
     return (
-        //imagem de fundo
         <ImageBackground
             source={require("../assets/fundo.login.png")}
             style={styles.background}
         >
-
             <Image source={require("../assets/logo.png")} style={styles.logo} />
 
-
             <Text style={styles.title}>Seja bem-vindo(a)!</Text>
-
 
             <Text style={styles.label}>E-MAIL</Text>
             <TextInput
@@ -81,11 +85,10 @@ export default function Login({ navigation }) {
                 placeholder="Digite seu e-mail"
                 placeholderTextColor="#aaa"
                 value={email}
-                onChangeText={setEmail}                  // Atualiza o estado "email" conforme o usuário digita
-                autoCapitalize="none"                    // Impede letras maiúsculas automáticas
-                keyboardType="email-address"             // Mostra teclado e-mail
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
             />
-
 
             <Text style={styles.label}>SENHA</Text>
             <View style={styles.passwordContainer}>
@@ -93,31 +96,28 @@ export default function Login({ navigation }) {
                     style={styles.inputSenha}
                     placeholder="Digite sua senha"
                     placeholderTextColor="#aaa"
-                    secureTextEntry={secureText}          //esconde(false) ou mostra(true) a senha dependendo do estado (olhinho; •••••••)
+                    secureTextEntry={secureText}
                     value={senha}
-                    onChangeText={setSenha}               //atualiza o estado "senha"
+                    onChangeText={setSenha}
                 />
-                {/* Botão com ícone de olho para mostrar/esconder senha */}
                 <TouchableOpacity onPress={() => setSecureText(!secureText)}>
                     <Ionicons
-                        name={secureText ? "eye-off-outline" : "eye-outline"} //muda o olho conforme o estado
+                        name={secureText ? "eye-off-outline" : "eye-outline"}
                         size={22}
                         color="#fff"
                     />
                 </TouchableOpacity>
             </View>
 
-
             <TouchableOpacity
                 style={styles.button}
-                onPress={handleLogin}        //função handleLogin ao clicar (função do botão cadast. pressionado)
-                disabled={loading}           //desativa o botão enquanto carrega
+                onPress={handleLogin}
+                disabled={loading}
             >
                 <Text style={styles.buttonText}>
-                    {loading ? "Entrando..." : "ENTRAR"} {/*Mostra "Entrando..." durante o login*/}
+                    {loading ? "Entrando..." : "ENTRAR"}
                 </Text>
             </TouchableOpacity>
-
 
             <Text style={styles.footerText}>
                 Não possui uma conta?
