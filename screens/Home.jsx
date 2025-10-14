@@ -25,7 +25,6 @@ export default function Home() {
         { id: 4, data: "28/09/2025", hora: "16h" },
     ];
 
-    // função de logout
     const handleLogout = async () => {
         Alert.alert(
             "Sair da conta",
@@ -51,7 +50,6 @@ export default function Home() {
             style={styles.background}
         >
             <SafeAreaView style={styles.container}>
-                {/* botão logout (seta superior) */}
                 <TouchableOpacity style={styles.backButton} onPress={handleLogout}>
                     <Ionicons name="log-out-outline" size={24} color="#fff" />
                 </TouchableOpacity>
@@ -113,19 +111,16 @@ export default function Home() {
                     <Text style={styles.buttonText}>AGENDAR</Text>
                 </TouchableOpacity>
 
-                {/* menu inferior */}
                 <View style={styles.footerMenu}>
-                    {/* ícone perfil → abre tela de editar perfil */}
                     <TouchableOpacity onPress={() => navigation.navigate("EditarPerfil")}>
                         <Ionicons name="person-outline" size={24} color="#fff" />
                     </TouchableOpacity>
 
-                    {/* ícone home */}
-                    <TouchableOpacity onPress={() => navigation.navigate("Home")}>>
+                    {/* Corrigido: removido '>' extra aqui */}
+                    <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                         <Ionicons name="home-outline" size={24} color="#fff" />
                     </TouchableOpacity>
 
-                    {/* ícone notificações */}
                     <TouchableOpacity style={{ position: "relative" }}>
                         <Ionicons name="notifications-outline" size={24} color="#fff" />
                         <View style={styles.badge}>
@@ -137,7 +132,6 @@ export default function Home() {
         </ImageBackground>
     );
 }
-
 
 const styles = StyleSheet.create({
     background: {
