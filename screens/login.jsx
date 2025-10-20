@@ -13,14 +13,12 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//exporta o componente Login
 export default function Login({ navigation }) {
-    const [email, setEmail] = useState("");        // e-mail
-    const [senha, setSenha] = useState("");        // senha
-    const [secureText, setSecureText] = useState(true); // controla visibilidade da senha
-    const [loading, setLoading] = useState(false); // indica carregamento
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
+    const [secureText, setSecureText] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    //função quando o botão "Entrar" é pressionado
     const handleLogin = async () => {
         if (!email || !senha) {
             Alert.alert("Erro", "Preencha todos os campos.");
@@ -39,6 +37,22 @@ export default function Login({ navigation }) {
             const data = await response.json();
             console.log("Resposta do backend:", data);
 
+            // Verifica mensagens do backend antes de prosseguir
+            if (data.error || data.status === "erro") {
+                const msg = (data.message || data.error || "").toLowerCase();
+
+                if (msg.includes("senha")) {
+                    Alert.alert("Erro", "Senha incorreta.");
+                } else if (msg.includes("inativ")) {
+                    Alert.alert("Erro", "Usuário inativado.");
+                } else if (msg.includes("não encontrado") || msg.includes("nao encontrado")) {
+                    Alert.alert("Erro", "Usuário não encontrado.");
+                } else {
+                    Alert.alert("Erro", data.message || "Erro ao efetuar login.");
+                }
+                return;
+            }
+
             // tenta pegar id e token dentro de data.usuario
             const userId = data.usuario?.id_cadastro;
             const token = data.usuario?.token;
@@ -49,15 +63,8 @@ export default function Login({ navigation }) {
                 return;
             }
 
-            // Salva ID do usuário no AsyncStorage
             await AsyncStorage.setItem("userId", String(userId));
-            console.log("ID salvo no AsyncStorage:", userId);
-
-            // Salva token se existir
-            if (token) {
-                await AsyncStorage.setItem("userToken", token);
-                console.log("Token salvo no AsyncStorage:", token);
-            }
+            if (token) await AsyncStorage.setItem("userToken", token);
 
             Alert.alert("Sucesso", data.message || "Login efetuado com sucesso!");
             navigation.replace("Home");

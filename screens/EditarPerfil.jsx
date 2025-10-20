@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import config from "../config"; // 🔹 Usa seu arquivo de configuração
+import config from "../config";
 
 export default function EditarPerfil({ navigation }) {
     const [nome, setNome] = useState("");
