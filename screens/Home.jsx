@@ -19,7 +19,8 @@ export default function Home() {
     const navigation = useNavigation();
 
     const horarios = [
-        { id: 1, data: "02/09/2025", hora: "18h" },
+        { id: 1, data: "02/09/2025", hora: "1" +
+                "8h" },
         { id: 2, data: "08/09/2025", hora: "16h" },
         { id: 3, data: "22/09/2025", hora: "16h" },
         { id: 4, data: "28/09/2025", hora: "16h" },
@@ -116,16 +117,16 @@ export default function Home() {
                         <Ionicons name="person-outline" size={24} color="#fff" />
                     </TouchableOpacity>
 
-                    {/* Corrigido: removido '>' extra aqui */}
                     <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                         <Ionicons name="home-outline" size={24} color="#fff" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={{ position: "relative" }}>
+                    <TouchableOpacity
+                        style={{ position: "relative" }}
+                        onPress={() => navigation.navigate("Lembretes")}
+                    >
                         <Ionicons name="notifications-outline" size={24} color="#fff" />
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>3</Text>
-                        </View>
+
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>

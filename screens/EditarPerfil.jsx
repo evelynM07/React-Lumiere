@@ -24,18 +24,47 @@ export default function EditarPerfil({ navigation }) {
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const userData = await AsyncStorage.getItem("userData");
-                if (userData) {
-                    const parsed = JSON.parse(userData);
-                    setUserId(parsed.id_cadastro);
-                    setNome(parsed.nome);
-                    setEmail(parsed.email);
-                    setTelefone(parsed.telefone);
+                const keys = ["userData", "user", "usuario"];
+                let userData = null;
+                let foundKey = null;
+
+                for (const key of keys) {
+                    const value = await AsyncStorage.getItem(key);
+                    if (value) {
+                        userData = value;
+                        foundKey = key;
+                        break;
+                    }
                 }
+
+                if (!userData) {
+                    Alert.alert("Aviso", "Nenhum dado de usuário encontrado.");
+                    console.log("Nenhum dado encontrado em:", keys);
+                    return;
+                }
+
+                const parsed = JSON.parse(userData);
+                console.log("Dados carregados da chave:", foundKey, parsed);
+
+                const id =
+                    parsed.id_cadastro || parsed.id || parsed.userId || null;
+                const nomeValue =
+                    parsed.nome || parsed.nome_usuario || parsed.user_name || "";
+                const emailValue =
+                    parsed.email || parsed.user_email || parsed.login || "";
+                const telefoneValue =
+                    parsed.telefone || parsed.celular || parsed.phone || "";
+
+                setUserId(id);
+                setNome(nomeValue);
+                setEmail(emailValue);
+                setTelefone(telefoneValue);
             } catch (err) {
                 console.error("Erro ao carregar dados:", err);
+                Alert.alert("Erro", "Falha ao carregar dados do usuário.");
             }
         };
+
         loadUser();
     }, []);
 
@@ -46,27 +75,30 @@ export default function EditarPerfil({ navigation }) {
         }
 
         try {
+            const bodyData = {
+                nome,
+                email,
+                telefone,
+                categoria: "comum",
+                tipo: "cliente",
+                ativo: 1,
+            };
+
+            if (senha && senha.trim() !== "") {
+                bodyData.senha = senha;
+            }
+
             const response = await fetch(`${config.IP_LOCAL}/cadastro/${userId}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    nome,
-                    email,
-                    telefone,
-                    senha,
-                    categoria: "comum",
-                    tipo: "cliente",
-                    ativo: 1,
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyData),
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 await AsyncStorage.setItem("userData", JSON.stringify(data.usuarios));
-                Alert.alert("Sucesso", "Usuário atualizado com sucesso!");
+                Alert.alert("Sucesso", "Usuário atualizado com sucesso.");
             } else {
                 Alert.alert("Erro", data.message || "Falha ao atualizar usuário.");
             }
@@ -124,6 +156,8 @@ export default function EditarPerfil({ navigation }) {
                         style={styles.input}
                         value={nome}
                         onChangeText={setNome}
+                        placeholder="Digite seu nome"
+                        placeholderTextColor="#aaa"
                     />
                 </View>
 
@@ -134,6 +168,8 @@ export default function EditarPerfil({ navigation }) {
                         keyboardType="email-address"
                         value={email}
                         onChangeText={setEmail}
+                        placeholder="Digite seu e-mail"
+                        placeholderTextColor="#aaa"
                     />
                 </View>
 
@@ -144,6 +180,8 @@ export default function EditarPerfil({ navigation }) {
                         keyboardType="phone-pad"
                         value={telefone}
                         onChangeText={setTelefone}
+                        placeholder="Digite seu telefone"
+                        placeholderTextColor="#aaa"
                     />
                 </View>
 
@@ -155,6 +193,8 @@ export default function EditarPerfil({ navigation }) {
                             secureTextEntry={!showPassword}
                             value={senha}
                             onChangeText={setSenha}
+                            placeholder="Digite uma nova senha (opcional)"
+                            placeholderTextColor="#aaa"
                         />
                         <TouchableOpacity
                             onPress={() => setShowPassword(!showPassword)}
