@@ -128,7 +128,7 @@ export default function EditarPerfil({ navigation }) {
 
     return (
         <ImageBackground
-            source={require("../assets/fundo.login.png")}
+            source={require("../assets/fundo_login.png")}
             style={styles.background}
         >
             <View style={styles.container}>

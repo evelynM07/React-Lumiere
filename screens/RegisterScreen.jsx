@@ -69,7 +69,7 @@ export default function RegisterScreen({ navigation }) {
     return (
         //imagem de fundo
         <ImageBackground
-            source={require("../assets/fundo.login.png")}
+            source={require("../assets/fundo_login.png")}
             style={styles.background}
         >
             {/*container principal da tela*/}

@@ -79,7 +79,7 @@ export default function Login({ navigation }) {
 
     return (
         <ImageBackground
-            source={require("../assets/fundo.login.png")}
+            source={require("../assets/fundo_login.png")}
             style={styles.background}
         >
             <Image source={require("../assets/logo.png")} style={styles.logo} />

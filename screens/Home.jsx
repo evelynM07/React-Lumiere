@@ -19,8 +19,7 @@ export default function Home() {
     const navigation = useNavigation();
 
     const horarios = [
-        { id: 1, data: "02/09/2025", hora: "1" +
-                "8h" },
+        { id: 1, data: "02/09/2025", hora: "18h" },
         { id: 2, data: "08/09/2025", hora: "16h" },
         { id: 3, data: "22/09/2025", hora: "16h" },
         { id: 4, data: "28/09/2025", hora: "16h" },
@@ -47,7 +46,7 @@ export default function Home() {
 
     return (
         <ImageBackground
-            source={require("../assets/fundo.brilho.png")}
+            source={require("../assets/fundo_brilho.png")}
             style={styles.background}
         >
             <SafeAreaView style={styles.container}>
@@ -62,14 +61,14 @@ export default function Home() {
                     <Text style={{ fontStyle: "italic" }}>Nome!</Text>
                 </Text>
 
-                <Text style={styles.label}>Selecione o serviço que deseja obter</Text>
-                <TouchableOpacity style={styles.selectButton}>
-                    <Text style={styles.selectText}>Selecione o serviço ></Text>
-                </TouchableOpacity>
-
-                <Text style={styles.label}>Selecione o profissional que deseja</Text>
+                <Text style={styles.label}>Selecione o profissional que deseja deseja</Text>
                 <TouchableOpacity style={styles.selectButton}>
                     <Text style={styles.selectText}>Selecione o profissional ></Text>
+                </TouchableOpacity>
+
+                <Text style={styles.label}>Selecione o serviço que obter</Text>
+                <TouchableOpacity style={styles.selectButton}>
+                    <Text style={styles.selectText}>Selecione o serviço ></Text>
                 </TouchableOpacity>
 
                 <Text style={styles.sectionTitle}>HORÁRIOS DISPONÍVEIS</Text>

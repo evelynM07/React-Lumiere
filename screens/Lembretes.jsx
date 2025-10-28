@@ -37,7 +37,7 @@ export default function Lembretes() {
 
     return (
         <ImageBackground
-            source={require("../assets/fundo.brilho.png")}
+            source={require("../assets/fundo_brilho.png")}
             style={styles.background}
         >
             <SafeAreaView style={styles.container}>
