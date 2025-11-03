@@ -34,8 +34,17 @@ export default function Login({ navigation }) {
                 body: JSON.stringify({ email, senha }),
             });
 
-            const data = await response.json();
-            console.log("Resposta do backend:", data);
+            const text = await response.text();
+            console.log("Resposta do backend:", text); // 👀 Mostra o que o backend devolve
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error("Erro ao converter para JSON:", e);
+                Alert.alert("Erro", "O servidor não retornou JSON válido.");
+                return;
+            }
 
             // Verifica mensagens do backend antes de prosseguir
             if (data.error || data.status === "erro") {

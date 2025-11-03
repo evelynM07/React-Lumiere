@@ -93,7 +93,6 @@ export default function Lembretes() {
 
                     <TouchableOpacity style={{ position: "relative" }}>
                         <Ionicons name="notifications-outline" size={24} color="#fff" />
-
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
