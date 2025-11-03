@@ -1,5 +1,5 @@
-const IP_LOCAL = "http://10.92.3.141:5000"
+const IP_LOCAL = "http://192.168.1.126:5000";
 
 export default {
-    IP_LOCAL,
+    API_URL: IP_LOCAL,
 };
